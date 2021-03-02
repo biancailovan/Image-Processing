@@ -2,6 +2,6 @@
 Image Processing 2021 laboratory
 
 
-L1 Introduction to the OpenCV library
+L1 - Introduction to the OpenCV library
 
-L2 Color spaces
+L2 - Color spaces
