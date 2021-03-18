@@ -372,8 +372,7 @@ void MyCallBackFunc(int event, int x, int y, int flags, void* param)
 
 
 /* Lab 1*/
-void grayScaleAdditive()
-{
+void grayScaleAdditive(){
 	char fname[MAX_PATH];
 	while (openFileDlg(fname))
 	{
@@ -383,23 +382,16 @@ void grayScaleAdditive()
 		int height = src.rows;
 		int width = src.cols;
 		Mat dst = Mat(height, width, CV_8UC1);
-		//float k = 2;
-		// Asa se acceseaaza pixelii individuali pt. o imagine cu 8 biti/pixel
-		// Varianta ineficienta (lenta)
-		for (int i = 0; i < height; i++)
-		{
-			for (int j = 0; j < width; j++)
-			{
+		for (int i = 0; i < height; i++){
+			for (int j = 0; j < width; j++){
 				uchar val = src.at<uchar>(i, j);
-				//uchar neg = MAX_PATH - val;
-				//dst.at<uchar>(i, j) = neg;
 				float k = 2;
 				float val_f = val + k;
-				if (val_f > 255) {
-					dst.at<uchar>(i, j) = 255;
+				if (val_f > 255) { 
+					dst.at<uchar>(i, j) = 255; 
 				}
-				else {
-					dst.at<uchar>(i, j) = val_f;
+				else { 
+					dst.at<uchar>(i, j) = val_f; 
 				}
 			}
 		}
@@ -408,15 +400,13 @@ void grayScaleAdditive()
 		t = ((double)getTickCount() - t) / getTickFrequency();
 		// Print (in the console window) the processing time in [ms] 
 		printf("Time = %.3f [ms]\n", t * 1000);
-
 		imshow("input image", src);
 		imshow("grey scale image", dst);
 		waitKey();
 	}
 }
 
-void grayScaleMultiplication()
-{
+void grayScaleMultiplication(){
 	char fname[MAX_PATH];
 	while (openFileDlg(fname))
 	{
@@ -426,16 +416,9 @@ void grayScaleMultiplication()
 		int height = src.rows;
 		int width = src.cols;
 		Mat dst = Mat(height, width, CV_8UC1);
-		//float k = 2;
-		// Asa se acceseaaza pixelii individuali pt. o imagine cu 8 biti/pixel
-		// Varianta ineficienta (lenta)
-		for (int i = 0; i < height; i++)
-		{
-			for (int j = 0; j < width; j++)
-			{
+		for (int i = 0; i < height; i++){
+			for (int j = 0; j < width; j++){
 				uchar val = src.at<uchar>(i, j);
-				//uchar neg = MAX_PATH - val;
-				//dst.at<uchar>(i, j) = neg;
 				float k = 2;
 				float val_f = val * k;
 				if (val_f > 255) {
@@ -451,24 +434,18 @@ void grayScaleMultiplication()
 		t = ((double)getTickCount() - t) / getTickFrequency();
 		// Print (in the console window) the processing time in [ms] 
 		printf("Time = %.3f [ms]\n", t * 1000);
-
 		imshow("input image", src);
 		imshow("grey scale image", dst);
-
-		//imwrite("Images/kids.bmp", dst); //writes the destination to file
 		waitKey();
 	}
 }
 
-void splitIn4Colors()
-{
-
+void splitIn4Colors(){
 	int height = 255;
 	int width = 255;
-
 	Mat img = Mat(height, width, CV_8UC3);
 
-	//cadranul 1
+	//cadran 1
 	for (int i = 0; i < height / 2; i++){
 		for (int j = 0; j < width / 2; j++){
 			Vec3b v3 = { 255, 255, 255 };
@@ -476,7 +453,7 @@ void splitIn4Colors()
 		}
 	}
 
-	//cadranul 2
+	//cadran 2
 	for (int i = 0; i < height / 2; i++){
 		for (int j = width / 2; j < width; j++){
 			Vec3b v3 = {0, 0, 255 };
@@ -484,7 +461,7 @@ void splitIn4Colors()
 		}
 	}
 
-	//cadranul 3
+	//cadran 3
 	for (int i = height / 2; i < height; i++){
 		for (int j = 0; j < width / 2; j++){
 			Vec3b v3 = { 0, 255, 0 };
@@ -492,7 +469,7 @@ void splitIn4Colors()
 		}
 	}
 
-	//cadranul 4
+	//cadran 4
 	for (int i = height / 2; i < height; i++){
 		for (int j = width / 2; j < width; j++){
 			Vec3b v3 = { 0, 255, 255 };
@@ -505,7 +482,7 @@ void splitIn4Colors()
 
 }
 
-void inversaMatricii() {
+void inverseMatrix() {
 	float v[] = { 1.0f, 2.0f, 3.0f, 4.0f, 5.f, -1.0f, -2.0f, -3.3f, -4.0f };
 
 	Mat mat1(3, 3, CV_32FC1, v);
@@ -520,8 +497,8 @@ void inversaMatricii() {
 /* Lab 2 */
 void RGB24() {
 	char fname[MAX_PATH];
-	while (openFileDlg(fname))
-	{
+	while (openFileDlg(fname)){
+
 		double t = (double)getTickCount(); // Get the current time [s]
 
 		Mat src = imread(fname);
@@ -542,8 +519,8 @@ void RGB24() {
 
 void colorToGrayScale() {
 	char fname[MAX_PATH];
-	while (openFileDlg(fname))
-	{
+	while (openFileDlg(fname)){
+
 		double t = (double)getTickCount(); // Get the current time [s]
 
 		Mat src = imread(fname, CV_LOAD_IMAGE_COLOR);
@@ -581,7 +558,6 @@ void GrayScaleToBinary() {
 
 		for (int i = 0; i < src.rows; i++) {
 			for (int j = 0; j < src.cols; j++) {
-				//dst.at<unsigned char>(i, j) = (src.at<Vec3b>(i, j)[0] + src.at<Vec3b>(i, j)[1] + src.at<Vec3b>(i, j)[2]) / 3;
 				if (src.at<uchar>(i, j) < threshold)
 					dst.at<uchar>(i, j) = 0;
 				if (src.at<uchar>(i, j) >= threshold)
@@ -629,7 +605,7 @@ void RGBToHSV() {
 				if (V!=0) {
 					S = C / V;
 				}
-				else { //negru
+				else { //black
 					S = 0;
 				}
 
@@ -679,9 +655,9 @@ void isInside1() {
 		int height = src.rows;
 		int width = src.cols;
 		int i, j;
-		std:: cout << "i=";
+		std:: cout << "i= ";
 		std::cin >> i;
-		std::cout << "j=";
+		std::cout << "j= ";
 		std::cin >> j;
 
 		if (i > 0 && j > 0 && i < height && j < width) {
@@ -695,7 +671,6 @@ void isInside1() {
 }
 
 int isInside(Mat img, int i, int j) {
-
 	if (i >= 0 && j >= 0 && i < img.rows && j < img.cols)
 		return 1;
 	else
@@ -757,41 +732,6 @@ void calculateHistogram() {
 	}
 }
 
-void calculateHist() {
-	char fname[MAX_PATH];
-
-	while (openFileDlg(fname))
-	{
-		double t = (double)getTickCount(); // Get the current time [s]
-
-		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
-		int height = src.rows;
-		int width = src.cols;
-		int hist[256];
-		int M = height * width;
-		float p[256];
-		Mat dst = Mat(height, width, CV_8UC1);
-
-		for (int i = 0; i < 256; i++) {
-			hist[i] = 0;
-		}
-
-		for (int i = 0; i < src.rows; i++) {
-			for (int j = 0; j < src.cols; j++) {
-				hist[src.at<uchar>(i, j)]++;
-			}
-		}
-
-		for (int i = 0; i < 256; i++) {
-			p[i] = (float)hist[i] / M;
-			//std::cout << p[i] << " ";
-		}
-
-		imshow("Src", src);
-		showHistogram("Histogram", hist, 256, 200);
-		waitKey(0);
-	}
-}
 
 void calculateFDP(Mat src, int hist[256], float p[256]) {
 	char fname[MAX_PATH];
@@ -831,7 +771,6 @@ void reducedAcc() {
 	int height = src.rows;
 	int width = src.cols;
 	int hist[256] = { 0 };
-	//int size = 255 / nrAcc;
 	int nrAcc = 2;
 	Mat dst = Mat(height, width, CV_8UC1);
 
@@ -855,11 +794,11 @@ void reducedAcc() {
 int WH = 5;
 float TH = 0.0003;
 
-void praguriMultiple() {
+void multilevelThresholding() {
 	char fname[MAX_PATH];
 
-	while (openFileDlg(fname))
-	{
+	while (openFileDlg(fname)){
+
 		double t = (double)getTickCount(); // Get the current time [s]
 		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
 		GaussianBlur(src, src, Size(5, 5), 0.8, 0.8);
@@ -891,11 +830,9 @@ void praguriMultiple() {
 				//inserare g => lista de maxime
 				list.push_back(g);
 			}
-			//}
 		}
 
 		list.push_back(255);
-		//showHistogram("new histo", hist, 256, 200, list);
 
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
@@ -921,8 +858,8 @@ void praguriMultiple() {
 void floydSteinberg() {
 	char fname[MAX_PATH];
 
-	while (openFileDlg(fname))
-	{
+	while (openFileDlg(fname)){
+
 		double t = (double)getTickCount(); // Get the current time [s]
 		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
 		GaussianBlur(src, src, Size(5, 5), 0.8, 0.8);
@@ -954,7 +891,6 @@ void floydSteinberg() {
 				//inserare g => lista de maxime
 				list.push_back(g);
 			}
-			//}
 		}
 
 		list.push_back(255);
@@ -976,7 +912,7 @@ void floydSteinberg() {
 		}
 
 		imshow("Praguri multiple", dst);
-		//showHistogram("Histo", hist, 256, 200);
+
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				uchar new_pixel;
@@ -1049,7 +985,7 @@ int area(Mat src, Vec3b pixel) {
 	return area;
 }
 
-void center(Mat src, Vec3b pixel, int& ri, int& ci) {
+void centerOfMass(Mat src, Vec3b pixel, int& ri, int& ci) {
 	int ar = area(src, pixel);
 	int width = src.cols;
 	int height = src.rows;
@@ -1081,7 +1017,7 @@ bool check_InCenter(Mat src, int i, int j, Vec3b pixel) {
 	return true;
 }
 
-int perimetru(Mat src, Vec3b pixel) {
+int perimeter(Mat src, Vec3b pixel) {
 	int perim = 0;
 	int width = src.cols;
 	int height = src.rows;
@@ -1097,7 +1033,7 @@ int perimetru(Mat src, Vec3b pixel) {
 }
 
 
-float axaAlungire(Mat src, Vec3b pixel, int ri, int ci) {
+float axisOfElongation(Mat src, Vec3b pixel, int ri, int ci) {
 	int num = 0, n1 = 0, n2 = 0;
 	int width = src.cols;
 	int height = src.rows;
@@ -1120,7 +1056,7 @@ float get_thinness_ratio(int area, int perimeter) {
 	return (4 * PI * area) / (perimeter*perimeter);
 }
 
-float elongation(Mat src, Vec3b pixel) {
+float ratioAspect(Mat src, Vec3b pixel) {
 	int cmax = 0, rmax = 0,cmin = src.rows, rmin = src.cols;
 	int width = src.cols;
 	int height = src.rows;
@@ -1181,15 +1117,15 @@ void onMouse(int event, int x, int y, int flags, void* param) {
 		Vec3b p = (*src).at<Vec3b>(y, x);
 		int r, c;
 		int a = area(*src, p);
-		int perimeter = perimetru(*src, p);
-		center(*src, p, r, c);
-		float unghi_alungire = axaAlungire(*src, p, r, c);
+		int perim = perimeter(*src, p);
+		centerOfMass(*src, p, r, c);
+		float unghi_alungire = axisOfElongation(*src, p, r, c);
 		std::cout << "Aria = " << a << '\n';
 		std::cout << "Centru masa: (" << c << ":" << r << ")\n";
 		std::cout << "Perimetru = " << perimeter << '\n';
 		std::cout << "Unghi axa alungire = " << unghi_alungire << '\n'; //teta
-		std::cout << "Factor subtiere = " << get_thinness_ratio(a, perimeter) << '\n';
-		std::cout << "Aspect ratio = " << elongation(*src, p) << '\n';
+		std::cout << "Factor subtiere = " << get_thinness_ratio(a, perim) << '\n';
+		std::cout << "Aspect ratio = " << ratioAspect(*src, p) << '\n';
 
 		projections(*src, p);
 		int delta = 30;
@@ -1199,9 +1135,9 @@ void onMouse(int event, int x, int y, int flags, void* param) {
 		DrawCross(copie, Point(c, r), 20, Scalar(255, 255, 255), 2);
 
 		P1.x = c - delta;
-		P1.y = r - (int)(delta * tan(axaAlungire(*src, p, r, c))); // teta is the elongation angle in radians
+		P1.y = r - (int)(delta * tan(axisOfElongation(*src, p, r, c))); // teta is the elongation angle in radians
 		P2.x = c + delta;
-		float teta = ((axaAlungire(*src, p, r, c)));
+		float teta = ((axisOfElongation(*src, p, r, c)));
 		P2.y = r + (int)(delta * tan(teta));
 		line(copie, P1, P2, Scalar(0, 0, 0), 1, 8);
 		imshow("Copie", copie);
@@ -1308,7 +1244,7 @@ int main()
 				splitIn4Colors();
 				break;
 			case 13:
-				inversaMatricii();
+				inverseMatrix();
 				break;
 			case 14:
 				//colorToGrayScale();
@@ -1333,7 +1269,7 @@ int main()
 				reducedAcc();
 				break;
 			case 21:
-				praguriMultiple();
+				multilevelThresholding();
 				break;
 			case 22:
 				floydSteinberg();
