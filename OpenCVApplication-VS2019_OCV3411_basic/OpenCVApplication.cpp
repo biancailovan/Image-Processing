@@ -370,27 +370,6 @@ void MyCallBackFunc(int event, int x, int y, int flags, void* param)
 		}
 }
 
-void testMouseClick()
-{
-	Mat src;
-	// Read image from file 
-	char fname[MAX_PATH];
-	while (openFileDlg(fname))
-	{
-		src = imread(fname);
-		//Create a window
-		namedWindow("My Window", 1);
-
-		//set the callback function for any mouse event
-		setMouseCallback("My Window", MyCallBackFunc, &src);
-
-		//show the image
-		imshow("My Window", src);
-
-		// Wait until user press some key
-		waitKey(0);
-	}
-}
 
 /* Lab 1*/
 void grayScaleAdditive()
@@ -693,7 +672,7 @@ void RGBToHSV() {
 	}
 }
 
-void isInside() {
+void isInside1() {
 	char fname[MAX_PATH];
 	while (openFileDlg(fname)) {
 		Mat src = imread(fname, CV_LOAD_IMAGE_COLOR);
@@ -713,6 +692,543 @@ void isInside() {
 		}
 	}
 	waitKey(0);
+}
+
+int isInside(Mat img, int i, int j) {
+
+	if (i >= 0 && j >= 0 && i < img.rows && j < img.cols)
+		return 1;
+	else
+		return 0;
+}
+
+/* Lab 3 */
+void showHistogram(const string& name, int* hist, const int hist_cols,
+
+	const int hist_height) {
+
+	Mat imgHist(hist_height, hist_cols, CV_8UC3, CV_RGB(255, 255, 255));
+
+	//computes histogram maximum
+	int max_hist = 0;
+	for (int i = 0; i < hist_cols; i++)
+		if (hist[i] > max_hist)
+			max_hist = hist[i];
+
+	double scale = 1.0;
+	scale = (double)hist_height / max_hist;
+	int baseline = hist_height - 1;
+	for (int x = 0; x < hist_cols; x++) {
+		Point p1 = Point(x, baseline);
+		Point p2 = Point(x, baseline - cvRound(hist[x] * scale));
+		line(imgHist, p1, p2, CV_RGB(255, 0, 255)); // histogram bins
+		// colored in magenta
+
+	}
+	imshow(name, imgHist);
+}
+
+void calculateHistogram() {
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+		double t = (double)getTickCount(); // Get the current time [s]
+
+		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		int height = src.rows;
+		int width = src.cols;
+		int hist[256];
+		Mat dst = Mat(height, width, CV_8UC1);
+
+		for (int i = 0; i < 256; i++) {
+			hist[i] = 0;
+		}
+
+		for (int i = 0; i < src.rows; i++) {
+			for (int j = 0; j < src.cols; j++) {
+				hist[src.at<uchar>(i, j)]++;
+			}
+		}
+
+		imshow("Src", src);
+		showHistogram("Histogram", hist, 256, 200);
+		waitKey(0);
+	}
+}
+
+void calculateHist() {
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+		double t = (double)getTickCount(); // Get the current time [s]
+
+		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		int height = src.rows;
+		int width = src.cols;
+		int hist[256];
+		int M = height * width;
+		float p[256];
+		Mat dst = Mat(height, width, CV_8UC1);
+
+		for (int i = 0; i < 256; i++) {
+			hist[i] = 0;
+		}
+
+		for (int i = 0; i < src.rows; i++) {
+			for (int j = 0; j < src.cols; j++) {
+				hist[src.at<uchar>(i, j)]++;
+			}
+		}
+
+		for (int i = 0; i < 256; i++) {
+			p[i] = (float)hist[i] / M;
+			//std::cout << p[i] << " ";
+		}
+
+		imshow("Src", src);
+		showHistogram("Histogram", hist, 256, 200);
+		waitKey(0);
+	}
+}
+
+void calculateFDP(Mat src, int hist[256], float p[256]) {
+	char fname[MAX_PATH];
+
+		double t = (double)getTickCount(); // Get the current time [s]
+		int height = src.rows;
+		int width = src.cols;
+		int M = height * width;
+		Mat dst = Mat(height, width, CV_8UC1);
+
+		for (int i = 0; i < 256; i++) {
+			hist[i] = 0; //h(g)
+		}
+
+		for (int i = 0; i < src.rows; i++) {
+			for (int j = 0; j < src.cols; j++) {
+				hist[src.at<uchar>(i, j)]++;
+			}
+		}
+
+		for (int i = 0; i < 256; i++) {
+			p[i] = (float)hist[i]/M;
+		}
+
+		waitKey(0);
+
+}
+
+void reducedAcc() {
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+	double t = (double)getTickCount(); // Get the current time [s]
+
+	Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+	int height = src.rows;
+	int width = src.cols;
+	int hist[256] = { 0 };
+	//int size = 255 / nrAcc;
+	int nrAcc = 2;
+	Mat dst = Mat(height, width, CV_8UC1);
+
+	for (int i = 0; i < 256; i++) {
+		hist[i] = 0;
+	}
+
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			hist[src.at<uchar>(i, j) / nrAcc]++;
+		}
+	}
+
+	imshow("Src", src);
+	showHistogram("Histogram", hist, 256, 200);
+	waitKey(0);
+	}
+}
+
+
+int WH = 5;
+float TH = 0.0003;
+
+void praguriMultiple() {
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+		double t = (double)getTickCount(); // Get the current time [s]
+		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		GaussianBlur(src, src, Size(5, 5), 0.8, 0.8);
+		int height = src.rows;
+		int width = src.cols;
+		int k = 0;
+		int hist[256];
+		int M = height * width;
+		float p[256]; //vector tip float de dim 256
+		float average;
+		int v[256];
+		Mat dst = src.clone();
+
+		calculateFDP(src, hist, p);
+		std::vector<uchar>list;
+		list.push_back(0);
+
+		for (int g = WH; g < 255 - WH; g++) {
+			average = 0;
+			bool isMaxim = true;
+			for (int i = -WH; i < WH; i++) {
+				average += p[g + i];
+				if (p[g] < p[g + i]) {
+					isMaxim = false; //max local
+				}
+			}
+			average = (float)average / (2 * WH + 1);
+			if (p[g] > (average + TH) && isMaxim) {
+				//inserare g => lista de maxime
+				list.push_back(g);
+			}
+			//}
+		}
+
+		list.push_back(255);
+		//showHistogram("new histo", hist, 256, 200, list);
+
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				for (int k = 0; k < list.size() - 1; k++) {
+					uchar val = src.at<uchar>(i, j);
+					if (val >= list.at(k) && val <= list.at(k + 1)) {
+						if (val < (list.at(k) + list.at(k + 1)) / 2)
+							dst.at<uchar>(i, j) = list.at(k);
+						else
+							dst.at<uchar>(i, j) = list.at(k + 1);
+
+					}
+				}
+			}
+		}
+		
+		imshow("Praguri multiple", dst);
+		showHistogram("Histo", hist, 256, 200);
+		waitKey(0);
+	}
+}
+
+void floydSteinberg() {
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+		double t = (double)getTickCount(); // Get the current time [s]
+		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		GaussianBlur(src, src, Size(5, 5), 0.8, 0.8);
+		int height = src.rows;
+		int width = src.cols;
+		int k = 0;
+		int hist[256];
+		int M = height * width;
+		float p[256]; //vector tip float de dim 256
+		float average;
+		int v[256];
+		Mat dst = src.clone();
+
+		calculateFDP(src, hist, p);
+		std::vector<uchar>list;
+		list.push_back(0);
+
+		for (int g = WH; g < 255 - WH; g++) {
+			average = 0;
+			bool isMaxim = true;
+			for (int i = -WH; i < WH; i++) {
+				average += p[g + i];
+				if (p[g] < p[g + i]) {
+					isMaxim = false; //max local
+				}
+			}
+			average = (float)average / (2 * WH + 1);
+			if (p[g] > (average + TH) && isMaxim) {
+				//inserare g => lista de maxime
+				list.push_back(g);
+			}
+			//}
+		}
+
+		list.push_back(255);
+		showHistogram("Histo", hist, 256, 200);
+
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				for (int k = 0; k < list.size() - 1; k++) {
+					uchar val = src.at<uchar>(i, j);
+					if (val >= list.at(k) && val <= list.at(k + 1)) {
+						if (val < (list.at(k) + list.at(k + 1)) / 2)
+							dst.at<uchar>(i, j) = list.at(k);
+						else
+							dst.at<uchar>(i, j) = list.at(k + 1);
+
+					}
+				}
+			}
+		}
+
+		imshow("Praguri multiple", dst);
+		//showHistogram("Histo", hist, 256, 200);
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				uchar new_pixel;
+				uchar old_pixel = src.at<uchar>(i, j);
+				for (int k = 0; k < list.size() - 1; k++) {
+					//uchar val = src.at<uchar>(i, j);
+					if (old_pixel >= list.at(k) && old_pixel <= list.at(k + 1)) {
+						if (old_pixel < (list.at(k) + list.at(k + 1)) / 2)
+							new_pixel = list.at(k);
+						else
+							new_pixel = list.at(k + 1);
+
+					}
+				}
+
+				src.at<uchar>(i, j) = new_pixel;
+				float error = old_pixel - new_pixel;
+				if (isInside(src, i, j + 1)) {
+					src.at<uchar>(i, j + 1) = src.at<uchar>(i, j + 1) + 7 * error / 16;
+				}
+				if (isInside(src, i + 1, j - 1)) {
+					src.at<uchar>(i + 1, j - 1) = src.at<uchar>(i + 1, j - 1) + 3 * error / 16;
+				}
+				if (isInside(src, i + 1, j)) {
+					src.at<uchar>(i + 1, j) = src.at<uchar>(i + 1, j) + 5 * error / 16;
+				}
+				if (isInside(src, i + 1, j + 1)) {
+					src.at<uchar>(i + 1, j + 1) = src.at<uchar>(i + 1, j + 1) + error / 16;
+				}
+
+			}
+		}
+		imshow("Floyd-Steinberg", src);
+		waitKey(0);		
+	}
+	
+}
+
+/* Lab 4 */
+
+void func_I(Mat src, Mat mat){
+	int height = src.rows;
+	int width = src.cols;
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++){
+			if (src.at<uchar>(i, j) != 0){
+				mat.at<uchar>(i, j) = 1;
+			}
+			else{
+				mat.at<uchar>(i, j) = 0;
+			}
+		}
+}
+
+bool equals(Vec3b pixel1, Vec3b pixel2) {
+	return (pixel1[0] == pixel2[0]) && (pixel1[1] == pixel2[1]) && (pixel1[2] == pixel2[2]);
+}
+
+int area(Mat src, Vec3b pixel) {
+	int area = 0;
+	int width = src.cols;
+	int height = src.rows;
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			if (equals(pixel, src.at<Vec3b>(i, j))) {
+				area += 1;
+			}
+		}
+	}
+	return area;
+}
+
+void center(Mat src, Vec3b pixel, int& ri, int& ci) {
+	int ar = area(src, pixel);
+	int width = src.cols;
+	int height = src.rows;
+	int r = 0, c = 0;
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			if (equals(pixel, src.at<Vec3b>(i, j))) {
+				r = r + i;
+				c = c + j;
+			}
+		}
+	}
+	ri = r / ar;
+	ci = c / ar;
+}
+
+bool check_InCenter(Mat src, int i, int j, Vec3b pixel) {
+	int width = src.cols;
+	int height = src.rows;
+	for (int m = i - 1; m <= i + 1; m++) {
+		for (int n = j - 1; n <= j + 1; n++) {
+			if (m >= 0 && m < height && n >= 0 && n < width && m != n) {
+				if (!equals(src.at<Vec3b>(m, n), pixel)) {
+					return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+
+int perimetru(Mat src, Vec3b pixel) {
+	int perim = 0;
+	int width = src.cols;
+	int height = src.rows;
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			if (equals(pixel, src.at<Vec3b>(i, j)) && !check_InCenter(src, i, j, pixel)) {
+				perim = perim + 1;
+			}
+		}
+	}
+
+	return perim;
+}
+
+
+float axaAlungire(Mat src, Vec3b pixel, int ri, int ci) {
+	int num = 0, n1 = 0, n2 = 0;
+	int width = src.cols;
+	int height = src.rows;
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			if (equals(pixel, src.at<Vec3b>(i, j))) {
+				num = num+ (i - ri) * (j - ci);
+				n1 = n1 + (j - ci) * (j - ci);
+				n2 = n2 + (i - ri) * (i - ri);
+			}
+		}
+	}
+
+	float teta = (atan2((2 * num),(n1-n2)))/ 2;
+	float angle_grade = (teta * 180) / PI;
+	return teta;
+}
+
+float get_thinness_ratio(int area, int perimeter) {
+	return (4 * PI * area) / (perimeter*perimeter);
+}
+
+float elongation(Mat src, Vec3b pixel) {
+	int cmax = 0, rmax = 0,cmin = src.rows, rmin = src.cols;
+	int width = src.cols;
+	int height = src.rows;
+
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			if (equals(pixel, src.at<Vec3b>(i, j))) {
+				if (i < rmin) { rmin = i; }
+				if (i > rmax) { rmax = i; }
+				if (j < cmin) { cmin = j; }
+				if (j > cmax) { cmax = j; }
+			}
+		}
+	}
+
+	float aspect_ratio = (float)(cmax - cmin + 1) / (rmax - rmin + 1);
+	return aspect_ratio;
+}
+
+void projections(Mat src, Vec3b p) {
+	int height = src.rows;
+	int width = src.cols;
+	int* h = (int*)malloc(sizeof(int) * height);
+	int* v = (int*)malloc(sizeof(int) * width);
+	memset(h, 0, sizeof(int) * height);
+	memset(v, 0, sizeof(int) * width);
+
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			if (equals(p, src.at<Vec3b>(i, j))) {
+				h[i]++;
+				v[j]++;
+			}
+		}
+	}
+
+
+	showHistogram("Orizontala", h, height, 200);
+	showHistogram("Verticala", v, width, 200);
+}
+
+void DrawCross(Mat& img, Point p, int size, Scalar color, int thickness){
+	line(img, Point(p.x - size / 2, p.y), Point(p.x + size / 2, p.y), color, thickness, 8);
+	line(img, Point(p.x, p.y - size / 2), Point(p.x, p.y + size / 2), color, thickness, 8);
+}
+
+
+void onMouse(int event, int x, int y, int flags, void* param) {
+	Mat* src = (Mat*)param;
+	Mat copie = (*src).clone();
+	if (event == CV_EVENT_LBUTTONDOWN)
+	{
+		printf("Pos(x,y): %d,%d  Color(RGB): %d,%d,%d\n",
+			x, y,
+			(int)(*src).at<Vec3b>(y, x)[2],
+			(int)(*src).at<Vec3b>(y, x)[1],
+			(int)(*src).at<Vec3b>(y, x)[0]);
+		Vec3b p = (*src).at<Vec3b>(y, x);
+		int r, c;
+		int a = area(*src, p);
+		int perimeter = perimetru(*src, p);
+		center(*src, p, r, c);
+		float unghi_alungire = axaAlungire(*src, p, r, c);
+		std::cout << "Aria = " << a << '\n';
+		std::cout << "Centru masa: (" << c << ":" << r << ")\n";
+		std::cout << "Perimetru = " << perimeter << '\n';
+		std::cout << "Unghi axa alungire = " << unghi_alungire << '\n'; //teta
+		std::cout << "Factor subtiere = " << get_thinness_ratio(a, perimeter) << '\n';
+		std::cout << "Aspect ratio = " << elongation(*src, p) << '\n';
+
+		projections(*src, p);
+		int delta = 30;
+		Point P1, P2;
+		copie.at<Vec3b>(c, r) = Vec3b(0, 0, 0);
+		//draw the center of mass
+		DrawCross(copie, Point(c, r), 20, Scalar(255, 255, 255), 2);
+
+		P1.x = c - delta;
+		P1.y = r - (int)(delta * tan(axaAlungire(*src, p, r, c))); // teta is the elongation angle in radians
+		P2.x = c + delta;
+		float teta = ((axaAlungire(*src, p, r, c)));
+		P2.y = r + (int)(delta * tan(teta));
+		line(copie, P1, P2, Scalar(0, 0, 0), 1, 8);
+		imshow("Copie", copie);
+	}
+}
+
+void testMouseClick()
+{
+	Mat src;
+	// Read image from file 
+	char fname[MAX_PATH];
+	while (openFileDlg(fname))
+	{
+		src = imread(fname);
+		//Create a window
+		namedWindow("My Window", 1);
+
+		//set the callback function for any mouse event
+		//setMouseCallback("My Window", MyCallBackFunc, &src);
+		setMouseCallback("My Window", onMouse, &src);
+
+		//show the image
+		imshow("My Window", src);
+
+		// Wait until user press some key
+		waitKey(0);
+	}
 }
 
 
@@ -743,6 +1259,10 @@ int main()
 		printf(" 16 - Split 3 matrices\n"); //1
 		printf(" 17 - RGB to HSV\n"); //4
 		printf(" 18 - Is Inside\n"); //5
+		printf(" 19 - Histogram\n");
+		printf(" 20 - Reduced histo\n");
+		printf(" 21 - Multilevel thresholding\n");
+		printf(" 22 - Floyd-Steinberg dithering \n");
 		printf(" 0 - Exit\n\n");
 
 		printf("Option: ");
@@ -804,7 +1324,19 @@ int main()
 				RGBToHSV();
 				break;
 			case 18:
-				isInside();
+				isInside1();
+				break;
+			case 19:
+				calculateHistogram();
+				break;
+			case 20:
+				reducedAcc();
+				break;
+			case 21:
+				praguriMultiple();
+				break;
+			case 22:
+				floydSteinberg();
 				break;
 			
 		}
