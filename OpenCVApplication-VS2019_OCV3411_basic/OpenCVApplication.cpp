@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "common.h"
+#include <random>
 
 void testOpenImage()
 {
@@ -371,7 +372,8 @@ void MyCallBackFunc(int event, int x, int y, int flags, void* param)
 }
 
 
-/* Lab 1*/
+/************************* Lab 1 *************************/
+
 void grayScaleAdditive(){
 	char fname[MAX_PATH];
 	while (openFileDlg(fname))
@@ -445,7 +447,7 @@ void splitIn4Colors(){
 	int width = 255;
 	Mat img = Mat(height, width, CV_8UC3);
 
-	//cadran 1
+	//1
 	for (int i = 0; i < height / 2; i++){
 		for (int j = 0; j < width / 2; j++){
 			Vec3b v3 = { 255, 255, 255 };
@@ -453,7 +455,7 @@ void splitIn4Colors(){
 		}
 	}
 
-	//cadran 2
+	//2
 	for (int i = 0; i < height / 2; i++){
 		for (int j = width / 2; j < width; j++){
 			Vec3b v3 = {0, 0, 255 };
@@ -461,7 +463,7 @@ void splitIn4Colors(){
 		}
 	}
 
-	//cadran 3
+	//3
 	for (int i = height / 2; i < height; i++){
 		for (int j = 0; j < width / 2; j++){
 			Vec3b v3 = { 0, 255, 0 };
@@ -469,7 +471,7 @@ void splitIn4Colors(){
 		}
 	}
 
-	//cadran 4
+	//4
 	for (int i = height / 2; i < height; i++){
 		for (int j = width / 2; j < width; j++){
 			Vec3b v3 = { 0, 255, 255 };
@@ -494,7 +496,8 @@ void inverseMatrix() {
 	waitKey(30000);
 }
 
-/* Lab 2 */
+/************************* Lab 2 *************************/
+
 void RGB24() {
 	char fname[MAX_PATH];
 	while (openFileDlg(fname)){
@@ -671,13 +674,14 @@ void isInside1() {
 }
 
 int isInside(Mat img, int i, int j) {
-	if (i >= 0 && j >= 0 && i < img.rows && j < img.cols)
+	if (i >= 0 && j >= 0 && i < img.rows-1 && j < img.cols-1)
 		return 1;
 	else
 		return 0;
 }
 
-/* Lab 3 */
+/************************* Lab 3 *************************/
+
 void showHistogram(const string& name, int* hist, const int hist_cols,
 
 	const int hist_height) {
@@ -807,7 +811,7 @@ void multilevelThresholding() {
 		int k = 0;
 		int hist[256];
 		int M = height * width;
-		float p[256]; //vector tip float de dim 256
+		float p[256];
 		float average;
 		int v[256];
 		Mat dst = src.clone();
@@ -822,12 +826,11 @@ void multilevelThresholding() {
 			for (int i = -WH; i < WH; i++) {
 				average += p[g + i];
 				if (p[g] < p[g + i]) {
-					isMaxim = false; //max local
+					isMaxim = false; 
 				}
 			}
 			average = (float)average / (2 * WH + 1);
 			if (p[g] > (average + TH) && isMaxim) {
-				//inserare g => lista de maxime
 				list.push_back(g);
 			}
 		}
@@ -868,7 +871,7 @@ void floydSteinberg() {
 		int k = 0;
 		int hist[256];
 		int M = height * width;
-		float p[256]; //vector tip float de dim 256
+		float p[256]; 
 		float average;
 		int v[256];
 		Mat dst = src.clone();
@@ -883,12 +886,11 @@ void floydSteinberg() {
 			for (int i = -WH; i < WH; i++) {
 				average += p[g + i];
 				if (p[g] < p[g + i]) {
-					isMaxim = false; //max local
+					isMaxim = false;
 				}
 			}
 			average = (float)average / (2 * WH + 1);
 			if (p[g] > (average + TH) && isMaxim) {
-				//inserare g => lista de maxime
 				list.push_back(g);
 			}
 		}
@@ -951,7 +953,7 @@ void floydSteinberg() {
 	
 }
 
-/* Lab 4 */
+/************************* Lab 4 *************************/
 
 void func_I(Mat src, Mat mat){
 	int height = src.rows;
@@ -1119,13 +1121,13 @@ void onMouse(int event, int x, int y, int flags, void* param) {
 		int a = area(*src, p);
 		int perim = perimeter(*src, p);
 		centerOfMass(*src, p, r, c);
-		float unghi_alungire = axisOfElongation(*src, p, r, c);
-		std::cout << "Aria = " << a << '\n';
-		std::cout << "Centru masa: (" << c << ":" << r << ")\n";
-		std::cout << "Perimetru = " << perimeter << '\n';
-		std::cout << "Unghi axa alungire = " << unghi_alungire << '\n'; //teta
-		std::cout << "Factor subtiere = " << get_thinness_ratio(a, perim) << '\n';
-		std::cout << "Aspect ratio = " << ratioAspect(*src, p) << '\n';
+		float teta = axisOfElongation(*src, p, r, c); // teta is the elongation angle in radians
+		std::cout << "Area = " << a << '\n';
+		std::cout << "Center of mass: (" << c << ":" << r << ")\n";
+		std::cout << "Perimeter = " << perimeter << '\n';
+		std::cout << "Teta angle = " << teta << '\n'; 
+		std::cout << "Thinness ratio = " << get_thinness_ratio(a, perim) << '\n';
+		std::cout << "Ratio aspect = " << ratioAspect(*src, p) << '\n';
 
 		projections(*src, p);
 		int delta = 30;
@@ -1135,14 +1137,102 @@ void onMouse(int event, int x, int y, int flags, void* param) {
 		DrawCross(copie, Point(c, r), 20, Scalar(255, 255, 255), 2);
 
 		P1.x = c - delta;
-		P1.y = r - (int)(delta * tan(axisOfElongation(*src, p, r, c))); // teta is the elongation angle in radians
+		P1.y = r - (int)(delta * tan(teta)); 
 		P2.x = c + delta;
-		float teta = ((axisOfElongation(*src, p, r, c)));
-		P2.y = r + (int)(delta * tan(teta));
+		P2.y = r + (int)(delta * tan(teta)); 
+
 		line(copie, P1, P2, Scalar(0, 0, 0), 1, 8);
 		imshow("Copie", copie);
 	}
 }
+
+boolean test_isInside(Mat img, int x, int y) {
+	if (x <= 0 || x > img.cols) { return false; }
+	if (y <= 0 || y > img.rows) { return false; }
+	return true;
+}
+
+/************************* Lab 5 *************************/
+
+void BreadthFirstTraversal() {
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+		double t = (double)getTickCount(); // Get the current time [s]
+
+		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat result = Mat(src.rows, src.cols, CV_8UC3);
+
+		Scalar colorLUT[1000] = { 0 };
+		Scalar color;
+		for (int i = 1; i < 1000; i++) {
+			Scalar color(rand() & 255, rand() & 255, rand() & 255);
+			colorLUT[i] = color;
+		}
+		colorLUT[0] = Scalar(0, 0, 0); //black; Scalar(255, 255, 255) for white
+
+		int height = src.rows;
+		int width = src.cols;
+		int di[8]{ 0,0,-1,1,1,1,-1,-1 };
+		int dj[8]{ -1,1,0,0,1,-1,1,-1 };
+		int label = 0;
+		Mat labels = Mat::zeros(src.rows, src.cols, CV_32SC1);
+
+		for (int i = 0; i < height; i++){
+			for (int j = 0; j < width; j++){
+				if ((src.at<uchar>(i, j) == 0) && (labels.at<int>(i, j) == 0))
+				{
+					label++;
+					int nr = 1;
+					std::queue<Point> Q;
+					labels.at<int>(i, j) = label;
+					Q.push({ j,i });
+					while (!Q.empty()){
+						Point q = Q.front();
+						Q.pop();
+
+						for (int k = 0; k < 8; k++){
+							int x = q.x + dj[k];
+							int y = q.y + di[k];
+							if (test_isInside(src, x, y)){
+								if ((src.at<uchar>(y, x) == 0) && (labels.at<int>(y, x) == 0)){
+									Q.push({ x,y });
+									labels.at<int>(y, x) = label;
+									nr++;
+								}
+							}
+
+						}
+					}
+
+					printf("%d\n ", nr);
+				}
+			}
+		}
+
+
+		for (int i = 1; i < height - 1; i++)
+			for (int j = 1; j < width - 1; j++){
+				Scalar color = colorLUT[labels.at<int>(i, j)]; // valabil pt. Met. 1 BFS
+				result.at<Vec3b>(i, j)[0] = color[0];
+				result.at<Vec3b>(i, j)[1] = color[1];
+				result.at<Vec3b>(i, j)[2] = color[2];
+			}
+
+
+		// Get the current time again and compute the time difference [s]
+		t = ((double)getTickCount() - t) / getTickFrequency();
+		// Print (in the console window) the processing time in [ms] 
+		printf("Time = %.3f [ms]\n", t * 1000);
+
+		imshow("Selected image", src);
+		imshow("Result image", result);
+		waitKey(0);
+	}
+
+}
+
 
 void testMouseClick()
 {
@@ -1190,15 +1280,16 @@ int main()
 		printf(" 11 - Grey scale multiplicative factor\n");
 		printf(" 12 - Split image in 4 colors\n");
 		printf(" 13 - Inverse matrix\n");
-		printf(" 14 - Color To Gray\n"); //2
-		printf(" 15 - Gray scale to Binary\n"); //3
-		printf(" 16 - Split 3 matrices\n"); //1
-		printf(" 17 - RGB to HSV\n"); //4
-		printf(" 18 - Is Inside\n"); //5
+		printf(" 14 - Color To Gray\n"); 
+		printf(" 15 - Gray scale to Binary\n"); 
+		printf(" 16 - Split 3 matrices\n"); 
+		printf(" 17 - RGB to HSV\n"); 
+		printf(" 18 - Is Inside\n"); 
 		printf(" 19 - Histogram\n");
 		printf(" 20 - Reduced histo\n");
 		printf(" 21 - Multilevel thresholding\n");
 		printf(" 22 - Floyd-Steinberg dithering \n");
+		printf(" 23 - Breadth first traversal \n");
 		printf(" 0 - Exit\n\n");
 
 		printf("Option: ");
@@ -1273,6 +1364,9 @@ int main()
 				break;
 			case 22:
 				floydSteinberg();
+				break;
+			case 23:
+				BreadthFirstTraversal();
 				break;
 			
 		}
