@@ -9,3 +9,5 @@ L2 - Color spaces
 L3 - The histogram of image intensity levels
 
 L4 - Geometrical features of binary objects
+
+L5 - Connected-component labeling
